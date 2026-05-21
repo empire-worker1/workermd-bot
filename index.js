@@ -13,7 +13,14 @@ const MENU_IMAGE = 'https://files.catbox.moe/uykbkb.jpg';
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 const sessions = {};
 
-http.createServer((req, res) => res.end('WORKER-MD actif')).listen(process.env.PORT || 3000);
+// Serveur HTTP pour Render
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end('WORKER-MD actif');
+}).listen(PORT, '0.0.0.0', () => {
+  console.log(`⚔️ Serveur HTTP actif sur port ${PORT}`);
+});
 
 const MENU_TEXT = `
 ╔══════════════════╗
