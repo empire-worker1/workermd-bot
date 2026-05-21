@@ -1,23 +1,26 @@
 const TelegramBot = require('node-telegram-bot-api');
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const fs = require('fs');
+const http = require('http');
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const OWNER_NUMBER = '24104160140';
-const CREATOR = 'SanZu';
+const CREATOR = 'ᴹᴿ᭄𝙨𝙖𝙣𝙯𝙪 𝙬𝙤𝙧𝙠𝙚𝙧';
 const BOT_NAME = 'WORKER-MD';
 const MENU_IMAGE = 'https://files.catbox.moe/uykbkb.jpg';
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 const sessions = {};
 
+http.createServer((req, res) => res.end('WORKER-MD actif')).listen(process.env.PORT || 3000);
+
 const MENU_TEXT = `
 ╔══════════════════╗
-║  ✦ ${BOT_NAME} ✦
+║  ⚔️ ${BOT_NAME} ⚔️
 ╚══════════════════╝
 
-╔════❰ 🖤 ʙᴏᴛ ɪɴғᴏ ❱════╗
+╔════❰ ⚔️ ʙᴏᴛ ɪɴғᴏ ❱════╗
 ║ 👑 ᴄʀᴇᴀᴛᴏʀ: ${CREATOR}
 ║ 📦 ᴘʀᴇғɪx: .
 ║ ⚙️ ᴍᴏᴅᴇ: ᴘᴜʙʟɪᴄ
@@ -32,18 +35,17 @@ const MENU_TEXT = `
 ║ ─ ᴍᴜᴛᴇ
 ║ ─ ᴜɴᴍᴜᴛᴇ
 ║ ─ ᴀᴅᴅ
-║ ─ ʜɪᴅᴇᴛᴀɢ
 ║ ─ ᴛᴀɢᴀʟʟ
 ║ ─ ʟɪɴᴋ
 ║ ─ ʀᴇᴠᴏᴋᴇ
+║ ─ ɢɪɴғᴏ
 ╚══════════════════╝
 
-╔══❰ ⚙️ sᴇᴛᴛɪɴɢs ❱══╗
-║ ─ ᴀɴᴛɪʟɪɴᴋ
-║ ─ ᴀɴᴛɪᴅᴇʟᴇᴛᴇ
-║ ─ ᴡᴇʟᴄᴏᴍᴇ
-║ ─ ᴀᴜᴛᴏʀᴇᴀᴄᴛ
-║ ─ ᴏɴʟɪɴᴇ
+╔══❰ 🛠️ ᴛᴏᴏʟs ❱══╗
+║ ─ ᴘɪɴɢ
+║ ─ ᴀʟɪᴠᴇ
+║ ─ ᴜᴘᴛɪᴍᴇ
+║ ─ ᴍᴇɴᴜ
 ╚══════════════════╝
 
 ╔══❰ 🎮 ғᴜɴ ❱══╗
@@ -54,14 +56,6 @@ const MENU_TEXT = `
 ║ ─ 8ʙᴀʟʟ
 ╚══════════════════╝
 
-╔══❰ 🛠️ ᴛᴏᴏʟs ❱══╗
-║ ─ ᴘɪɴɢ
-║ ─ ᴜᴘᴛɪᴍᴇ
-║ ─ ᴀʟɪᴠᴇ
-║ ─ sᴛɪᴄᴋᴇʀ
-║ ─ ᴡᴇᴀᴛʜᴇʀ
-╚══════════════════╝
-
 ╔══❰ 📥 ᴅᴏᴡɴʟᴏᴀᴅ ❱══╗
 ║ ─ ʏᴛᴠ
 ║ ─ sᴏɴɢ
@@ -69,15 +63,14 @@ const MENU_TEXT = `
 ║ ─ ɪɴsᴛᴀɢʀᴀᴍ
 ╚══════════════════╝
 
-> 🖤 *© POWERED BY ${CREATOR}*
+> ⚔️ *© POWERED BY ${CREATOR}*
 `;
 
-// /start
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
   bot.sendPhoto(chatId, MENU_IMAGE, {
     caption: `
-🖤 *WORKER-MD* 🖤
+⚔️ *WORKER-MD* ⚔️
 
 ʙɪᴇɴᴠᴇɴᴜ sᴜʀ ʟᴇ ʙᴏᴛ ᴅᴇ *${CREATOR}*
 
@@ -88,13 +81,12 @@ bot.onText(/\/start/, (msg) => {
 ║ /delete — sᴜᴘᴘʀɪᴍᴇʀ sᴇssɪᴏɴ
 ╚══════════════════╝
 
-🖤 *The shadows await your command...*
+⚔️ *The warrior awaits your command...*
     `,
     parse_mode: 'Markdown'
   });
 });
 
-// /menu
 bot.onText(/\/menu/, (msg) => {
   const chatId = msg.chat.id;
   bot.sendPhoto(chatId, MENU_IMAGE, {
@@ -103,10 +95,9 @@ bot.onText(/\/menu/, (msg) => {
   });
 });
 
-// /pair
 bot.onText(/\/pair/, async (msg) => {
   const chatId = msg.chat.id;
-  bot.sendMessage(chatId, `
+  await bot.sendMessage(chatId, `
 📱 *ᴄᴏɴɴᴇᴄᴛ ᴡʜᴀᴛsᴀᴘᴘ*
 
 ᴇɴᴠᴏɪᴇ ᴛᴏɴ ɴᴜᴍᴇʀᴏ ᴀᴠᴇᴄ ɪɴᴅɪᴄᴀᴛɪғ:
@@ -120,26 +111,33 @@ bot.onText(/\/pair/, async (msg) => {
       return bot.sendMessage(chatId, '❌ Numéro invalide.');
     }
 
-    bot.sendMessage(chatId, '⏳ *Génération du code...* Patiente 5 secondes.', { parse_mode: 'Markdown' });
+    await bot.sendMessage(chatId, '⏳ *Génération du code en cours...*', { parse_mode: 'Markdown' });
 
     try {
       const sessionPath = `./sessions/${chatId}`;
       if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath, { recursive: true });
 
       const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+      const { version } = await fetchLatestBaileysVersion();
+
       const sock = makeWASocket({
+        version,
         auth: state,
         logger: pino({ level: 'silent' }),
         printQRInTerminal: false,
+        browser: ['WORKER-MD', 'Chrome', '1.0.0'],
       });
 
       sessions[chatId] = sock;
+      sock.ev.on('creds.update', saveCreds);
+
+      await new Promise(r => setTimeout(r, 3000));
 
       const code = await sock.requestPairingCode(phone);
       const formatted = code.match(/.{1,4}/g).join('-');
 
-      bot.sendMessage(chatId, `
-🖤 *WORKER-MD PAIRING* 🖤
+      await bot.sendMessage(chatId, `
+⚔️ *WORKER-MD PAIRING* ⚔️
 
 📱 *Phone:* +${phone}
 🔑 *Code:* \`${formatted}\`
@@ -149,34 +147,44 @@ bot.onText(/\/pair/, async (msg) => {
 3️⃣ Lier avec numéro de téléphone
 4️⃣ Entre le code ci-dessus
 
-⏳ *Expire dans 2 minutes*
+⚠️ *Entre le code rapidement*
 
-> 🖤 *© ${CREATOR}*
+> ⚔️ *© ${CREATOR}*
       `, { parse_mode: 'Markdown' });
 
-      sock.ev.on('creds.update', saveCreds);
-      sock.ev.on('connection.update', ({ connection }) => {
+      sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
         if (connection === 'open') {
-          bot.sendMessage(chatId, `✅ *WhatsApp connecté avec succès!*\n\n🖤 *WORKER-MD est actif*`, { parse_mode: 'Markdown' });
+          await bot.sendMessage(chatId, `
+⚔️ *WhatsApp connecté avec succès!*
+
+👑 *WORKER-MD est actif*
+⚔️ *${CREATOR}*
+
+> ᴛᴀᴘᴇ *.menu* sᴜʀ ᴡʜᴀᴛsᴀᴘᴘ
+          `, { parse_mode: 'Markdown' });
         }
         if (connection === 'close') {
-          bot.sendMessage(chatId, '❌ *Connexion fermée.*', { parse_mode: 'Markdown' });
+          const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+          if (shouldReconnect) {
+            await bot.sendMessage(chatId, '🔄 *Reconnexion en cours...*', { parse_mode: 'Markdown' });
+          } else {
+            await bot.sendMessage(chatId, '❌ *Déconnecté. Utilise /pair pour reconnecter.*', { parse_mode: 'Markdown' });
+          }
         }
       });
 
     } catch (err) {
-      bot.sendMessage(chatId, `❌ Erreur: ${err.message}`);
+      bot.sendMessage(chatId, `❌ *Erreur:* ${err.message}`, { parse_mode: 'Markdown' });
     }
   });
 });
 
-// /status
 bot.onText(/\/status/, (msg) => {
   const chatId = msg.chat.id;
   const connected = sessions[chatId] ? '✅ Connecté' : '❌ Non connecté';
   bot.sendMessage(chatId, `
 ╔══════════════════╗
-║ 🖤 *WORKER-MD STATUS*
+║ ⚔️ *WORKER-MD STATUS*
 ╠══════════════════╣
 ║ 📡 Statut: ${connected}
 ║ 👑 Owner: ${CREATOR}
@@ -184,19 +192,19 @@ bot.onText(/\/status/, (msg) => {
   `, { parse_mode: 'Markdown' });
 });
 
-// /delete
-bot.onText(/\/delete/, (msg) => {
+bot.onText(/\/delete/, async (msg) => {
   const chatId = msg.chat.id;
   const sessionPath = `./sessions/${chatId}`;
+  if (sessions[chatId]) {
+    try { await sessions[chatId].logout(); } catch (e) {}
+    delete sessions[chatId];
+  }
   if (fs.existsSync(sessionPath)) {
     fs.rmSync(sessionPath, { recursive: true });
-    delete sessions[chatId];
     bot.sendMessage(chatId, '🗑️ *Session supprimée.*', { parse_mode: 'Markdown' });
   } else {
     bot.sendMessage(chatId, '⚠️ *Aucune session trouvée.*', { parse_mode: 'Markdown' });
   }
 });
 
-console.log(`🖤 WORKER-MD Bot démarré par ${CREATOR}`);
-const http = require('http');
-http.createServer((req, res) => res.end('WORKER-MD actif')).listen(process.env.PORT || 3000);
+console.log(`⚔️ WORKER-MD Bot démarré par ${CREATOR}`);
