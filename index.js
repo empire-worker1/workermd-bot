@@ -198,3 +198,5 @@ bot.onText(/\/delete/, (msg) => {
 });
 
 console.log(`🖤 WORKER-MD Bot démarré par ${CREATOR}`);
+const http = require('http');
+http.createServer((req, res) => res.end('WORKER-MD actif')).listen(process.env.PORT || 3000);
